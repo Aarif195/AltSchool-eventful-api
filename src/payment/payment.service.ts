@@ -5,6 +5,7 @@ import { firstValueFrom } from 'rxjs';
 import { PrismaService } from '../prisma/prisma.service';
 import { TransactionStatus } from '@prisma/client';
 import * as crypto from 'crypto';
+import { TicketService } from 'src/ticket/ticket.service';
 
 @Injectable()
 export class PaymentService {
@@ -15,6 +16,7 @@ export class PaymentService {
         private readonly configService: ConfigService,
         private readonly prisma: PrismaService,
         private readonly httpService: HttpService,
+        private readonly ticketService: TicketService,
     ) {
         this.secretKey = this.configService.getOrThrow<string>('paystack.secretKey');
     }
@@ -98,6 +100,16 @@ export class PaymentService {
                 });
 
                 // Next Phase Hook: Ticket generation will trigger right here!
+
+                await tx.event.update({
+                    where: { id: metadata.eventId },
+                    data: { availableTickets: { decrement: 1 } },
+                });
+
+                // Trigger generation immediately upon database update confirmation
+                await this.ticketService.generateTicket(metadata.eventId, metadata.userId);
+
+
             });
         }
     }

@@ -11,6 +11,7 @@ import { EventModule } from './event/event.module';
 import { ConfigModule } from '@nestjs/config';
 import { envConfig } from './config/env.config';
 import { PaymentModule } from './payment/payment.module';
+import { TicketModule } from './ticket/ticket.module';
 
 @Module({
   imports: [PrismaModule, AuthModule,
@@ -23,7 +24,7 @@ import { PaymentModule } from './payment/payment.module';
       ttl: 60000,
       limit: 100,
     },
-  ]), EventModule, PaymentModule],
+  ]), EventModule, PaymentModule, TicketModule],
   controllers: [AppController],
 
   providers: [AppService, {
