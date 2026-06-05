@@ -8,9 +8,14 @@ import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { RolesGuard } from './auth/roles.guard';
 import { EventModule } from './event/event.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [PrismaModule, AuthModule, ThrottlerModule.forRoot([
+  imports: [PrismaModule, AuthModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    ThrottlerModule.forRoot([
     {
       ttl: 60000,
       limit: 100,
