@@ -3,11 +3,113 @@
 
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
-generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
-}
+
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  CREATOR
+  EVENTEE
+}
+
+enum TicketStatus {
+  PENDING
+  VALID
+  SCANNED
+  CANCELLED
+}
+
+enum TransactionStatus {
+  PENDING
+  SUCCESSFUL
+  FAILED
+}
+
+model User {
+  id                  String                @id @default(uuid())
+  email               String                @unique
+  password            String
+  fullName            String
+  role                Role                  @default(EVENTEE)
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  events              Event[]               @relation("CreatedEvents")
+  tickets             Ticket[]
+  transactions        Transaction[]
+  customNotifications NotificationSetting[]
+
+  @@map("users")
+}
+
+model Event {
+  id                  String                @id @default(uuid())
+  title               String
+  description         String
+  location            String
+  eventDate           DateTime
+  ticketPrice         Decimal               @db.Decimal(10, 2)
+  totalCapacity       Int
+  availableTickets    Int
+  creatorId           String
+  creator             User                  @relation("CreatedEvents", fields: [creatorId], references: [id], onDelete: Cascade)
+  creatorReminderDays Int?                  // e.g., 1 for 1 day before, 7 for 1 week before
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  tickets             Ticket[]
+  transactions        Transaction[]
+  customNotifications NotificationSetting[]
+
+  @@map("events")
+}
+
+model Ticket {
+  id          String       @id @default(uuid())
+  eventId     String
+  event       Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  eventeeId   String
+  eventee     User         @relation(fields: [eventeeId], references: [id], onDelete: Cascade)
+  qrCodePayload String     @unique // Secure cryptographically signed payload
+  status      TicketStatus @default(VALID)
+  scannedAt   DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@map("tickets")
+}
+
+model Transaction {
+  id            String            @id @default(uuid())
+  reference     String            @unique // Paystack reference
+  amount        Decimal           @db.Decimal(10, 2)
+  status        TransactionStatus @default(PENDING)
+  userId        String
+  user          User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eventId       String
+  event         Event             @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  metadata      Json?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  @@map("transactions")
+}
+
+model NotificationSetting {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eventId      String
+  event        Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  reminderDays Int      // Custom setting by eventee (e.g., 2 days before)
+  isProcessed  Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  @@unique([userId, eventId])
+  @@map("notification_settings")
 }
