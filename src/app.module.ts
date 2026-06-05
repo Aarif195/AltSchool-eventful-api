@@ -7,6 +7,7 @@ import { APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { RolesGuard } from './auth/roles.guard';
+import { EventModule } from './event/event.module';
 
 @Module({
   imports: [PrismaModule, AuthModule, ThrottlerModule.forRoot([
@@ -14,7 +15,7 @@ import { RolesGuard } from './auth/roles.guard';
       ttl: 60000,
       limit: 100,
     },
-  ])],
+  ]), EventModule],
   controllers: [AppController],
 
   providers: [AppService, {
