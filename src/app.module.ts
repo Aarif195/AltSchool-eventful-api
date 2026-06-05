@@ -9,10 +9,13 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { RolesGuard } from './auth/roles.guard';
 import { EventModule } from './event/event.module';
 import { ConfigModule } from '@nestjs/config';
+import { envConfig } from './config/env.config';
+import { PaymentModule } from './payment/payment.module';
 
 @Module({
   imports: [PrismaModule, AuthModule,
     ConfigModule.forRoot({
+      load: [envConfig],
       isGlobal: true,
     }),
     ThrottlerModule.forRoot([
@@ -20,7 +23,7 @@ import { ConfigModule } from '@nestjs/config';
       ttl: 60000,
       limit: 100,
     },
-  ]), EventModule],
+  ]), EventModule, PaymentModule],
   controllers: [AppController],
 
   providers: [AppService, {
