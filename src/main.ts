@@ -8,7 +8,9 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, { rawBody: true });
 
   // Set Global API Versioning Prefix
-  app.setGlobalPrefix('api/v1');
+  app.setGlobalPrefix('api/v1', {
+  exclude: ['/'], 
+});
 
   // Global Request Validation Engine
   app.useGlobalPipes(
