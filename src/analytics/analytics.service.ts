@@ -111,4 +111,5 @@ export class AnalyticsService {
       checkInRatePercentage: checkInRate,
     };
   }
+  
 }

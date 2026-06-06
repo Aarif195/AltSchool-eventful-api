@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Get, Body, HttpCode, HttpStatus, Query } from '@nestjs/common';
 import { TicketService } from './ticket.service';
 import { VerifyTicketDto } from './dto/verify-ticket.dto';
 import { Roles } from '../auth/roles.decorator';
@@ -6,6 +6,7 @@ import { Role } from '@prisma/client';
 import { GetUser } from '../auth/get-user.decorator';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiForbiddenResponse, ApiUnauthorizedResponse, ApiOkResponse, ApiBadRequestResponse, ApiNotFoundResponse, ApiBody } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
+import { PaginationQueryDto } from 'src/dto/pagination.dto';
 
 
 @ApiTags('Tickets')
@@ -32,7 +33,14 @@ export class TicketController {
             qrCodePayload: 'TKT-DEC-85721-SECURE-HASH-STRING',
             qrCodeBase64Image: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...'
           }
-        ]
+        ],
+        meta: {
+          totalItems: 15,
+          itemCount: 1,
+          itemsPerPage: 10,
+          totalPages: 2,
+          currentPage: 1
+        }
       }
     }
   })
@@ -55,16 +63,25 @@ export class TicketController {
       }
     }
   })
-  async getMyTickets(@GetUser('id') userId: string) {
-    const tickets = await this.ticketService.findUserTickets(userId);
+  async getMyTickets(
+    @GetUser('id') userId: string,
+    @Query() paginationQuery: PaginationQueryDto,
+  ) {
+    const result = await this.ticketService.findUserTickets(userId, paginationQuery);
 
     // Attach base64 data URLs dynamically so frontends can display the images instantly
-    return Promise.all(
-      tickets.map(async (t) => ({
+    const mappedData = await Promise.all(
+      result.data.map(async (t) => ({
         ...t,
         qrCodeBase64Image: await this.ticketService.renderQrCodeBase64(t.qrCodePayload),
       })),
     );
+
+    return {
+      statusCode: 200,
+      data: mappedData,
+      meta: result.meta,
+    };
   }
 
   //  Ticket validation at gate

@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { TicketStatus } from '@prisma/client';
 import * as crypto from 'crypto';
 import * as QRCode from 'qrcode';
+import { PaginationQueryDto } from 'src/dto/pagination.dto';
 
 @Injectable()
 export class TicketService {
@@ -15,7 +16,7 @@ export class TicketService {
   // Generates and saves a ticket with a cryptographically signed payload
   async generateTicket(eventId: string, eventeeId: string) {
     const ticketId = crypto.randomUUID();
-    
+
     // Create a secure payload hash: HMAC(ticketId + eventId + eventeeId)
     const signature = crypto
       .createHmac('sha256', this.secretKey)
@@ -46,12 +47,35 @@ export class TicketService {
   }
 
   // Find all tickets belonging to an Eventee
-  async findUserTickets(userId: string) {
-    return this.prisma.ticket.findMany({
-      where: { eventeeId: userId },
-      include: { event: true },
-      orderBy: { createdAt: 'desc' },
-    });
+  async findUserTickets(userId: string, paginationQuery: PaginationQueryDto) {
+
+    const { page = 1, limit = 10 } = paginationQuery;
+    const skip = (page - 1) * limit;
+
+    const [totalItems, data] = await this.prisma.$transaction([
+      this.prisma.ticket.count({ where: { eventeeId: userId } }),
+      this.prisma.ticket.findMany({
+        where: { eventeeId: userId },
+        include: { event: true },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+    ]);
+
+    const totalPages = Math.ceil(totalItems / limit);
+
+
+    return {
+      data,
+      meta: {
+        totalItems,
+        itemCount: data.length,
+        itemsPerPage: limit,
+        totalPages,
+        currentPage: page,
+      },
+    };
   }
 
   // Creator Gate-Verification Engine
