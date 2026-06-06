@@ -16,6 +16,7 @@ import { MailModule } from './mail/mail.module';
 import { NotificationModule } from './notification/notification.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { BullModule } from '@nestjs/bullmq';
+import { AnalyticsModule } from './analytics/analytics.module';
 
 
 
@@ -45,7 +46,8 @@ import { BullModule } from '@nestjs/bullmq';
     PaymentModule,
     TicketModule,
     MailModule,
-    NotificationModule
+    NotificationModule,
+    AnalyticsModule
   ],
   controllers: [AppController],
 
