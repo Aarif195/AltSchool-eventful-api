@@ -1,4 +1,4 @@
-import { Controller, Get, Param, ParseUUIDPipe } from '@nestjs/generic';
+import { Controller, Get, Param, ParseUUIDPipe } from '@nestjs/common';
 import { AnalyticsService } from './analytics.service';
 import { Roles } from '../auth/roles.decorator';
 import { Role } from '@prisma/client';
@@ -7,7 +7,7 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Analytics')
 @ApiBearerAuth()
-@Roles(Role.CREATOR) // Protect all endpoints within this controller strictly for Creators
+@Roles(Role.CREATOR)
 @Controller('analytics')
 export class AnalyticsController {
   constructor(private readonly analyticsService: AnalyticsService) {}
