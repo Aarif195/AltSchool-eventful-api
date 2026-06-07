@@ -8,6 +8,7 @@ import {
   ApiUnauthorizedResponse,
   ApiForbiddenResponse
 } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 import { EventService } from './event.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { Roles } from '../decorators/roles.decorator';
@@ -17,7 +18,7 @@ import { Public } from '../decorators/public.decorator';
 import { Throttle } from '@nestjs/throttler';
 import { PaginationQueryDto } from 'src/dto/pagination.dto';
 
-
+@ApiTags('Event')
 @Controller('events')
 export class EventController {
   constructor(private readonly eventService: EventService) { }
