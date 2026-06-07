@@ -5,7 +5,6 @@ import { LoginDto } from './dto/login.dto';
 import { Public } from './public.decorator';
 import { Throttle } from '@nestjs/throttler';
 import {
-  ApiTags,
   ApiOperation,
   ApiBody,
   ApiCreatedResponse,

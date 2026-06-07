@@ -17,6 +17,7 @@ import { Throttle } from '@nestjs/throttler';
 export class PaymentController {
   constructor(private readonly paymentService: PaymentService) { }
 
+  @Throttle({ default: { limit: 6, ttl: 60000 } })
   @Post('initialize')
   @Roles(Role.EVENTEE)
   @ApiBearerAuth()

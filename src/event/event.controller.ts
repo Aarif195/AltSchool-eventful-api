@@ -84,7 +84,7 @@ export class EventController {
     // Get all events created by the creator
     // Accessible to all authenticated or unauthenticated users to explore
     @Public() 
-    @Throttle({ default: { limit: 3, ttl: 60000 } })
+    @Throttle({ default: { limit: 6, ttl: 60000 } })
     @Get()
     @ApiOperation({ summary: 'Get all upcoming events' })
     @ApiOkResponse({
@@ -121,7 +121,7 @@ export class EventController {
   }
 
     // Get all events created by the logged in creator
-    @Throttle({ default: { limit: 3, ttl: 60000 } })
+    @Throttle({ default: { limit: 6, ttl: 60000 } })
     @Get('creator/my-events')
     @Roles(Role.CREATOR)
     @ApiOperation({ summary: 'Get all events created by the logged in creator' })

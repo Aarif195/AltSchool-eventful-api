@@ -1,29 +1,6 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Eventful Capstone API Engine
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
-
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Eventful is a high-performance, production-grade event ticketing, application, and real-time sales analytics platform built as a final Capstone project at AltSchool Africa. The engine is architected around modular isolation, cryptographic validation layers, asynchronous task workers, and comprehensive role-based access control.
 
 ## Project setup
 
@@ -44,55 +21,92 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
-## Run tests
+---
 
-```bash
-# unit tests
-$ npm run test
+## Key Architectural Features
 
-# e2e tests
-$ npm run test:e2e
+* **Role-Based Access Control (RBAC):** Strict operational segregation using custom NestJS Guards mapping two explicit personas:
+  * `CREATOR`: Manage full lifecycle event listings, validate attendee codes, and view aggregation dashboards.
+  * `EVENTEE`: Catalog discovery, automated booking triggers, secure ticket viewing, and notification profiling.
+* **Cryptographic Ticketing Gate Engine:** Successful payments instantly mint unique tickets embedded with an HMAC-SHA256 signature token string (`ticketId.hashSignature`), rendering to secure Base64 QR code data URLs for frontend rendering.
+* **Asynchronous Message Queue Pattern:** Built using **BullMQ** and **Redis (Key-Value)** to isolate bulk email dispatch overhead away from the main thread loop.
+* **Automated Cron Scheduling Engine:** Daily midnight cron workers evaluate user alert preferences and push delivery payloads dynamically to a **Brevo SMTP API** transport handler.
+* **Real-time Performance Analytics:** Optimized multi-layer Prisma database aggregation queries compiling total transaction sizes, velocity rates, and entry gate check-in percentages.
 
-# test coverage
-$ npm run test:cov
+---
+
+## Built With
+
+* **Framework:** NestJS (Node.js) with TypeScript
+* **Database:** PostgreSQL
+* **ORM Layer:** Prisma ORM
+* **Task Management:** BullMQ & Redis (Key-Value)
+* **Email Provider Engine:** Brevo API (V3 SMTP)
+* **Documentation Layer:** Swagger UI (OpenAPI Specification)
+* **Security & Resilience:** Bcrypt, Passport-JWT, NestJS Throttler (Rate-Limiter)
+
+---
+
+## System Setup Requirements
+
+### Environment Configurations
+Create a `.env` file in the project's root directory and map the following operational variables:
+
+```env
+# Application Platform Execution Configurations
+PORT=3000
+ALLOWED_ORIGINS="*"
+JWT_SECRET="your-super-secure-production-secret-key-for-eventful"
+
+# Persistent Relational Data Store Configuration
+DATABASE_URL="postgresql://username:password@localhost:5432/student-welfare-platform?schema=public"
+
+# Paystack API Gate Integration Parameters
+PAYSTACK_SECRET_KEY="sk_test_..."
+PAYSTACK_PUBLIC_KEY="pk_test_..."
+
+# Asynchronous Memory Data Buffer Layout
+REDIS_HOST="localhost"
+REDIS_PORT=6379
+
+# Brevo SMTP Delivery Layer Credentials
+BREVO_API_KEY="xkeysib-..."
+MAIL_SENDER_EMAIL="your-registered-brevo-email@example.com"
+MAIL_SENDER_NAME="Eventful Platform"
 ```
 
-## Deployment
+### Security Considerations
+```
+Global Pipes: Explicitly flags whitelist: true and forbidNonWhitelisted: true to scrub unexpected attributes away from input streams.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+Brute-Force Shield: Universal ThrottlerGuard locks standard routes while enforcing a strict limit of 3 attempts per minute over sensitive authorization points (/auth/login, /auth/register).
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+Webhook Integrity: Paystack webhook endpoint mandates raw payload mapping via an independent buffer to calculate matching x-paystack-signature headers before processing balances.
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+---
 
-## Resources
+### Database Migrations
 
-Check out a few resources that may come in handy when working with NestJS:
+```bash
+# Create initial migration schema
+$ npx prisma migrate dev --name init
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+# Apply migration after schema changes
+$ npx prisma migrate deploy
 
-## Support
+# Generate new Prisma client from schema
+$ npx prisma generate
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### Project Live link
 
-## Stay in touch
+https://altschool-eventful-api.onrender.com/
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### API Testing Documentation (Swagger)
 
-## License
+Interactive API documentation is automatically served at the following endpoint:
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+```
+https://altschool-eventful-api.onrender.com/api/docs/#/
+```
