@@ -1,8 +1,8 @@
 import { Controller, Get, Param, ParseUUIDPipe } from '@nestjs/common';
 import { AnalyticsService } from './analytics.service';
-import { Roles } from '../auth/roles.decorator';
+import { Roles } from '../decorators/roles.decorator';
 import { Role } from '@prisma/client';
-import { GetUser } from '../auth/get-user.decorator';
+import { GetUser } from '../decorators/get-user.decorator';
 import { ApiBearerAuth, ApiOperation, ApiTags, ApiParam, ApiOkResponse, ApiUnauthorizedResponse, ApiNotFoundResponse } from '@nestjs/swagger';
 
 @ApiTags('Analytics')

@@ -2,7 +2,7 @@ import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
-import { Public } from './public.decorator';
+import { Public } from '../decorators/public.decorator';
 import { Throttle } from '@nestjs/throttler';
 import {
   ApiOperation,

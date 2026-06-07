@@ -1,9 +1,9 @@
 import { Controller, Post, Get, Body, HttpCode, HttpStatus, Query } from '@nestjs/common';
 import { TicketService } from './ticket.service';
 import { VerifyTicketDto } from './dto/verify-ticket.dto';
-import { Roles } from '../auth/roles.decorator';
+import { Roles } from '../decorators/roles.decorator';
 import { Role } from '@prisma/client';
-import { GetUser } from '../auth/get-user.decorator';
+import { GetUser } from '../decorators/get-user.decorator';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiForbiddenResponse, ApiUnauthorizedResponse, ApiOkResponse, ApiBadRequestResponse, ApiNotFoundResponse, ApiBody } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { PaginationQueryDto } from 'src/dto/pagination.dto';

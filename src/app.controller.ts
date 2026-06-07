@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
 import { ApiOperation, ApiInternalServerErrorResponse, ApiOkResponse } from '@nestjs/swagger';
-import { Public } from './auth/public.decorator';
+import { Public } from './decorators/public.decorator';
 import { Throttle } from '@nestjs/throttler';
 
 @Controller()

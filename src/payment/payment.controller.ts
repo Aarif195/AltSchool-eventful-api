@@ -4,10 +4,10 @@ import type { Request, Response } from 'express';
 import type { RawBodyRequest } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiBearerAuth, ApiForbiddenResponse, ApiHeader, ApiOkResponse, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { CreatePaymentIntentDto, PaymentIntentResponseDto } from './dto/payment.dto';
-import { Roles } from '../auth/roles.decorator';
+import { Roles } from '../decorators/roles.decorator';
 import { Role } from '@prisma/client';
-import { GetUser } from '../auth/get-user.decorator';
-import { Public } from '../auth/public.decorator';
+import { GetUser } from '../decorators/get-user.decorator';
+import { Public } from '../decorators/public.decorator';
 import { Throttle } from '@nestjs/throttler';
 
 
