@@ -6,7 +6,8 @@ import {
   ApiCreatedResponse,
   ApiBadRequestResponse,
   ApiUnauthorizedResponse,
-  ApiForbiddenResponse
+  ApiForbiddenResponse,
+  ApiBearerAuth
 } from '@nestjs/swagger';
 import { ApiTags } from '@nestjs/swagger';
 import { EventService } from './event.service';
@@ -20,12 +21,14 @@ import { PaginationQueryDto } from 'src/dto/pagination.dto';
 
 @ApiTags('Event')
 @Controller('events')
+
 export class EventController {
   constructor(private readonly eventService: EventService) { }
 
   // Create event
   @Throttle({ default: { limit: 3, ttl: 60000 } })
   @Post()
+  @ApiBearerAuth()
   @Roles(Role.CREATOR)
   @ApiOperation({ summary: 'Create a new event' })
   @ApiBody({ type: CreateEventDto })
@@ -125,6 +128,7 @@ export class EventController {
   @Throttle({ default: { limit: 6, ttl: 60000 } })
   @Get('creator/my-events')
   @Roles(Role.CREATOR)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get all events created by the logged in creator' })
   @ApiOkResponse({
     description: 'Successfully retrieved paginated list of events created by the creator.',

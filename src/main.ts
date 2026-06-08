@@ -42,8 +42,6 @@ async function bootstrap() {
     .setTitle('Eventful API')
     .setDescription('Event Management API for AltSchool Africa')
     .setVersion('1.0')
-    .addTag('events')
-    .addTag('auth')
     .addBearerAuth()
     .build();
 

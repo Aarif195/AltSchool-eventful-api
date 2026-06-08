@@ -105,6 +105,9 @@ export class PaymentController {
       example: 'Invalid webhook signature integrity'
     }
   })
+
+  
+  // handleWebhook
   async handleWebhook(@Req() req: RawBodyRequest<Request>, @Res() res: Response) {
     const signature = req.headers['x-paystack-signature'] as string;
     if (!req.rawBody) {
