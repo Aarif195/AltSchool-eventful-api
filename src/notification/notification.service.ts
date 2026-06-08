@@ -72,4 +72,17 @@ export class NotificationService {
       }
     }
   }
+
+  // saveAttendeePreference
+  async saveAttendeePreference(userId: string, eventId: string, reminderDays: number) {
+    return this.prisma.notificationSetting.create({
+      data: {
+        userId,
+        eventId,
+        reminderDays,
+        isProcessed: false,
+      },
+    });
+  }
+
 }

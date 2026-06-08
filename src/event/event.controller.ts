@@ -1,4 +1,5 @@
-import { Controller, Post, Get, Body, Query } from '@nestjs/common';
+import { Controller, Post, Get, Body, Query, Param, ParseUUIDPipe, Res } from '@nestjs/common';
+import type { Response } from 'express';
 import {
   ApiOperation,
   ApiBody,
@@ -7,7 +8,10 @@ import {
   ApiBadRequestResponse,
   ApiUnauthorizedResponse,
   ApiForbiddenResponse,
-  ApiBearerAuth
+  ApiBearerAuth,
+  ApiParam,
+  ApiProduces,
+  ApiNotFoundResponse
 } from '@nestjs/swagger';
 import { ApiTags } from '@nestjs/swagger';
 import { EventService } from './event.service';
@@ -184,4 +188,72 @@ export class EventController {
   ) {
     return this.eventService.findCreatorEvents(creatorId, paginationQuery);
   }
+
+
+// getShareMetadata
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
+  @Public()
+  @Get(':id/share')
+  @ApiOperation({ summary: 'Retrieve dynamic HTML OpenGraph metadata tags for social media platform link sharing' })
+  @ApiParam({
+    name: 'id',
+    description: 'The unique system structural UUID of the target event entry resource matching dataset records',
+    type: String,
+    example: 'a5c8df41-1191-4e7d-965b-bf4e5659828d'
+  })
+  @ApiProduces('text/html')
+  @ApiOkResponse({
+    description: 'HTML metadata template compilation parsed successfully with active social graph headers.',
+    schema: {
+      type: 'string',
+      example: '<!DOCTYPE html><html><head><meta property="og:title" content="Tech Summit"...'
+    }
+  })
+  @ApiNotFoundResponse({
+    description: 'The requested event ID could not be identified inside the database mapping infrastructure.',
+    schema: {
+      example: {
+        statusCode: 404,
+        message: 'Event with ID a5c8df41-1191-4e7d-965b-bf4e5659828d not found',
+        error: 'Not Found'
+      }
+    }
+  })
+  @ApiBadRequestResponse({
+    description: 'The passed structural query parameters fail string context validation requirements.',
+    schema: {
+      example: {
+        statusCode: 400,
+        message: 'Validation failed (uuid is expected)',
+        error: 'Bad Request'
+      }
+    }
+  })
+  async getShareMetadata(@Param('id', ParseUUIDPipe) id: string, @Res() res: Response) {
+    const event = await this.eventService.findOneEvent(id); 
+    
+    const htmlMetadata = `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <title>${event.title}</title>
+        <meta name="description" content="${event.description}">
+        <meta property="og:title" content="${event.title}">
+        <meta property="og:description" content="${event.description}">
+        <meta property="og:type" content="event">
+        <meta property="og:url" content="https://eventful.platform/events/${event.id}">
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="${event.title}">
+        <meta name="twitter:description" content="${event.description}">
+      </head>
+      <body>
+        <p>Redirecting to event application details...</p>
+        <script>window.location.href = "https://eventful.platform/events/${event.id}";</script>
+      </body>
+      </html>
+    `;
+    return res.status(200).send(htmlMetadata);
+  }
+
 }
